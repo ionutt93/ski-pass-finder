@@ -1,4 +1,5 @@
 var Data = require('../data.js');
+var React = require("react");
 
 class Algorithm extends React.Component {
 	containsAllLocations(passLocations, testLocations) {

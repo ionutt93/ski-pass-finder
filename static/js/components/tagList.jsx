@@ -1,3 +1,5 @@
+var React = require("react");
+
 class TagList extends React.Component {
 	render() {
 		const tags = this.props.tags != undefined ? this.props.tags : [];
