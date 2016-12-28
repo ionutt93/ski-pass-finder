@@ -1,7 +1,12 @@
-var Data = require('../data.js');
-var React = require("react");
+import DataLayer from '../dataLayer.js';
+import React from 'react';
 
 class Algorithm extends React.Component {
+	constructor(props) {
+		super(props);
+		this.dataLayer = new DataLayer();
+	}
+
 	containsAllLocations(passLocations, testLocations) {
 		var contains = true;
 		if (testLocations.length == 0) contains = false;
@@ -18,7 +23,7 @@ class Algorithm extends React.Component {
 
 	possiblePassesFor(tags) {
 		const _tags = tags != undefined ? tags : [];
-		const passes = Data.filter(pass => this.containsAllLocations(pass.locations, _tags))
+		const passes = dataLayer.filter(pass => this.containsAllLocations(pass.locations, _tags))
 						   .sort((a, b) => this.averagePrice(a.prices) - this.averagePrice(b.prices))
 						   .map(pass => pass.name);
 		return passes;

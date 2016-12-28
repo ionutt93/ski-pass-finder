@@ -1,20 +1,65 @@
 import React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Chip from 'material-ui/Chip';
+import DataLayer from '../dataLayer.js'
 
-const Data = require('../data.js');
+class ChipData {
+	constructor(state) {
+		if (state == undefined) {
+			this.state = [];
+		} else {
+			this.state = state;
+			console.log(this.state);
+		}
+	}
+
+	getState() {
+		return this.state;
+	}
+
+	pushLabel(label) {
+		if (label == undefined) return this;
+
+		const indexOf = this.state.map(x => x.label).indexOf(label);
+		if (indexOf == -1) {
+			const newState = this.state.concat([{
+				key: this.state.length,
+				label: label
+			}]);
+			return new ChipData(newState);
+		}
+		return this;
+	}
+
+	refreshKeys(state) {
+		return state.map((chip, i) => {
+			return {
+				key: i,
+				label: chip.label
+			};
+		});
+	}
+
+	removeKey(key) {
+		if (key == undefined) return this;
+
+		const chipToRemove = this.state.map(x => x.key).indexOf(key);
+		if (chipToRemove != -1) {
+			const newState = this.refreshKeys(this.state.slice(0, chipToRemove).concat(this.state.splice(chipToRemove + 1)));
+			return new ChipData(newState);
+		}
+		return this;
+	}
+
+}
 
 export default class SearchBox extends React.Component {
 	constructor(props) {
 		super(props);
+		this.dataLayer = new DataLayer();
 		this.state = {
-			dataSource: this.getLocations(),
-			chipData: [
-			    {key: 0, label: 'Angular'},
-			    {key: 1, label: 'JQuery'},
-			    {key: 2, label: 'Polymer'},
-			    {key: 3, label: 'ReactJS'}
-			]
+			dataSource: this.dataLayer.getLocations(),
+			chipData: new ChipData()
 		};
 		this.styles = {
       		chip: {
@@ -25,35 +70,21 @@ export default class SearchBox extends React.Component {
 	      		flexWrap: 'wrap',
 	      	}
   		};
-
-		console.log(this.state.dataSource);
+  		
 		this.onNewRequest = this.onNewRequest.bind(this);
 	}
 
-	getLocations() {
-		var locationsSet = new Set([]);
-		Data.forEach(x => {
-			x.locations.forEach(l => locationsSet.add(l));
-		});
-		return Array.from(locationsSet);
-	}
-
 	onNewRequest(chosenRequest, index) {
-		var newChipData = this.state.chipData;
-		newChipData.push({ 
-			key: newChipData.length,
-			label: chosenRequest
-		});
+		const that = this;
 		this.setState({
-			chipData: newChipData
+			chipData: that.state.chipData.pushLabel(chosenRequest)
 		});
 	}
 
 	handleRequestDelete(key) {
-	    this.chipData = this.state.chipData;
-	    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(key);
-	    this.chipData.splice(chipToDelete, 1);
-	    this.setState({chipData: this.chipData});
+	    this.setState({
+	    	chipData: this.state.chipData.removeKey(key)
+	    });
   	}
 
 	renderChip(data) {
@@ -76,7 +107,7 @@ export default class SearchBox extends React.Component {
 							  fullWidth={true}
 							  onNewRequest={this.onNewRequest}/>
 				<div style={this.styles.wrapper}>
-					{this.state.chipData.map(this.renderChip, this)}
+					{this.state.chipData.getState().map(this.renderChip, this)}
 				</div>
 				
 

@@ -1,8 +1,8 @@
 var TagInputBox = require('./tagInputBox.jsx');
 var Algorithm   = require('./algorithm.jsx')
-var React = require("react");
-var Data = require("../data.js");
 
+import DataLayer from '../dataLayer.js';
+import React from 'react';
 import SearchBox from './searchBox.jsx';
 
 class PriceSearch extends React.Component {
@@ -18,12 +18,7 @@ class PriceSearch extends React.Component {
 		parent.setState({tags: _tags});
 	}
 
-	getLocations() {
-		return Array.from(Data.reduce((a, b) => {
-			const _set = new Set([b.locations]);
-			return new Set([a, b]);
-		}, new Set([])));
-	}
+	
 
 	render() {
 		return (
